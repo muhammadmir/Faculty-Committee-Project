@@ -62,3 +62,7 @@ The MySQL DB should have the following Tables with the following headers:
     * FacultyName
     * CommitteeCode
     * Serving Period
+
+## To-do List
+1. Document Flask code
+2. Make front-end prettier
