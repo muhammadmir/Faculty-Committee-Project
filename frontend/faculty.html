@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.6/b-2.4.2/rg-1.4.1/sp-2.2.0/sl-1.7.0/datatables.min.css"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script
+        src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.6/b-2.4.2/rg-1.4.1/sp-2.2.0/sl-1.7.0/datatables.min.js"></script>
+    
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/helper.js"></script>
+    <script src="./js/faculty.js"></script>
+
+</head>
+
+<body>
+    <div class="options">
+        <button class="button-4" role="button" id="viewCommitteeButton">View Committees</button>
+        <button class="button-4" role="button" id="viewRelationButton">View Relations</button>
+    </div>
+
+    <div class="table">
+        <table id="facultyTable" class="row-border compact" width="100%">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Affiliation</th>
+                    <th>Title</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="modal fade" id="facultyAddModal" tabindex="-1" role="dialog" aria-labelledby="facultyAddModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="facultyAddModalLabel">Enter Faculty Information</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="facultyName">Name:</label>
+                            <input type="text" class="form-control" id="facultyName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="facultyDepartment">Department:</label>
+                            <input type="text" class="form-control" id="facultyDepartment" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="facultyAffiliation">Affiliation:</label>
+                            <input type="text" class="form-control" id="facultyAffiliation" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="facultyTitle">Title:</label>
+                            <input type="text" class="form-control" id="facultyTitle" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeFacultyAdd">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveFacultyAdd">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="facultyEditModal" tabindex="-1" role="dialog" aria-labelledby="facultyEditModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="facultyAddModalLabel">Edit Faculty Information</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="selectFaculty">Faculty</label>
+                            <select class="form-select" id="selectFaculty">
+                                <option selected>Choose...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectFacultyChangeKey">What to Change?</label>
+                            <select class="form-select" id="selectFacultyChangeKey">
+                                <option selected>Choose...</option>
+                                <option value="FacultyName">Name</option>
+                                <option value="FacultyDepartment">Department</option>
+                                <option value="FacultyAffiliation">Affiliation</option>
+                                <option value="FacultyTitle">Title</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentFacultyValue">Current Value:</label>
+                            <input class="form-control" id="currentFacultyValue" type="text" placeholder="Select what to change" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="newFacultyName">New Value:</label>
+                            <input type="text" class="form-control" id="newFacultyValue" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeFacultyEdit">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveFacultyEdit">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    document.getElementById("viewCommitteeButton").onclick = function () {
+        window.location.href = "committee.html";
+    };
+   
+    document.getElementById("viewRelationButton").onclick = function () {
+        window.location.href = "relation.html";
+    };
+</script>
+
+</html>
