@@ -7,6 +7,7 @@ $(document).ready(function () {
             data: data.Table,
             select: true,
             dom: 'PBfrtip',
+            pageLength: 20,
             buttons: [
                 {
                     text: "Delete Selected Row",

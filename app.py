@@ -22,7 +22,17 @@ config = {
 
 CNX = mysql.connector.connect(**config)
 
-def faculty_attribute_lookup(cursor: MySQLCursor, faculty_name: str):
+def faculty_attribute_lookup(cursor: MySQLCursor, faculty_name: str) -> list[dict]:
+    """Looks up all of the ID's, Department's, Affiliation's, and Title's associated with Faculty's Name in
+    the Faculty Table. This function is exclusively used when formatting data for the Relation Page.
+
+    Args:
+        cursor (MySQLCursor): MySQLCursor Object.
+        faculty_name (str): Faculty's Name.
+
+    Returns:
+        list[dict]: A list of dictonaries containing the attributes.
+    """
     attributes = []
     query = "SELECT * FROM Faculty WHERE FacultyName = %s"
 
@@ -40,7 +50,17 @@ def faculty_attribute_lookup(cursor: MySQLCursor, faculty_name: str):
         print(f"Faculty Attribute Lookup | Error: {e}")
     return attributes
 
-def committee_lookup(cursor: MySQLCursor, committee_code: str):
+def committee_lookup(cursor: MySQLCursor, committee_code: str) -> dict:
+    """Look's up the Committee ID, Designation, Code, Name, and Type associated with the Committee Code in the
+    Committee Table.
+
+    Args:
+        cursor (MySQLCursor): MySQLCursor Object.
+        committee_code (str): Committee Code.
+
+    Returns:
+        dict: A dictionary object contataining the information regarding the Committee.
+    """
     committee = {}
     query = "SELECT * FROM Committee WHERE CommitteeCode = %s"
 
@@ -56,7 +76,13 @@ def committee_lookup(cursor: MySQLCursor, committee_code: str):
         print(f"Committee Lookup | Error: {e}")
     return committee
 
-def format_faculty_table():
+def get_faculty_table() -> list[dict]:
+    """Get's all the rows in the Faculty Table.
+
+    Returns:
+        list[dict]: A list of dictonaries containing the ID, Name, Department, Affiliation, and Title of
+        each Faculty Member. 
+    """
     cursor = CNX.cursor()
     results = []
     query = "SELECT * FROM Faculty"
@@ -78,7 +104,13 @@ def format_faculty_table():
     cursor.close()
     return results
 
-def format_committee_table():
+def get_committee_table() -> list[dict]:
+    """Get's all the rows in the Committee Table.
+
+    Returns:
+        list[dict]: A list of dictonaries containing the ID, Name, Code, Designation, and Type of each
+        each Committee. 
+    """
     cursor = CNX.cursor()
     results = []
     query = "SELECT * FROM Committee"
@@ -100,7 +132,13 @@ def format_committee_table():
     cursor.close()
     return results
 
-def format_relation_table():
+def get_relation_table() -> list[dict]:
+    """Get's all the rows in the Relation Table. 
+
+    Returns:
+        list[dict]: A list of dictonaries containing the ID and Name of the Relation, the Attributes associated
+        with the Faculty Name, and the Committee information associated with the Relation.
+    """
     cursor = CNX.cursor()
     results = []
     query = "SELECT * FROM Relation"
@@ -125,25 +163,30 @@ def format_relation_table():
     cursor.close()
     return results
 
-def handle_getting(table: str):
+def handle_getting(table: str) -> list[dict]:
+    """Get's a special list of dictonaries from the Faculty and Committee Tables that make the editing
+    feature of the Faculty, Committee, and Relation Page's more easier.
+    
+    If the table is Faculty, then each dictonary object has the Name and Department of the Faculty Member.
+    If the table is Committee, then each dictonary object has the Name and Code of the Commmittee. 
+
+    Args:
+        table (str): Either Faculty or Committee.
+
+    Returns:
+        list[dict]: A list of dictonaries containing the relevant information from the table.
+    """
     results = []
     cursor = CNX.cursor()
 
-    columns = (
-        "FacultyName, FacultyDepartment"
-        if table == "Faculty"
-        else "CommitteeName, CommitteeCode"
-    )
+    columns = "FacultyName, FacultyDepartment" if table == "Faculty" else "CommitteeName, CommitteeCode"
     query = f"SELECT DISTINCT {columns} FROM {table}"
 
     try:
         cursor.execute(query)
         results = cursor.fetchall()
         if table == "Faculty":
-            results = [
-                {"Name": name, "Department": department}
-                for (name, department) in results
-            ]
+            results = [{"Name": name, "Department": department} for (name, department) in results]
         else:
             results = [{"Name": name, "Code": code} for (name, code) in results]
     except Exception as e:
@@ -152,7 +195,17 @@ def handle_getting(table: str):
     cursor.close()
     return results
 
-def add_row(table: str, data: dict):
+def add_row(table: str, data: dict) -> dict:
+    """Adds a row to the table.
+
+    Args:
+        table (str): Either Faculty, Committee, or Relation.
+        data (dict): The appropriate data related to the table.
+
+    Returns:
+        dict: A dictonary containing the Success and Error keys, wherever applicable, indicating if
+        the operation was successful or not and error associated with it.
+    """
     cursor = CNX.cursor()
     output = {"Success": False}
 
@@ -172,12 +225,25 @@ def add_row(table: str, data: dict):
     cursor.close()
     return output
 
-def edit_row(table: str, data: dict):
+def edit_row(table: str, data: dict) -> dict:
+    """Edits a row to the table.
+
+    Args:
+        table (str): Either Faculty, Committee, or Relation.
+        data (dict): The appropriate data related to the table, including a key containing a list of
+        lookup keys.
+
+    Returns:
+        dict: A dictonary containing the Success and Error keys, wherever applicable, indicating if the
+        operation was successful or not and error associated with it.
+    """
     cursor = CNX.cursor()
     output = {"Success": False}
 
     conditions = ""
     lookup_keys = data["Lookup Keys"]
+    
+    # Dynamically formats the list of look up keys in AND logic. 
     for lookup in lookup_keys:
         key = list(lookup.keys())[0]
         conditions += key + " = %s"
@@ -186,10 +252,7 @@ def edit_row(table: str, data: dict):
     query = f'UPDATE {table} SET {data["Update Key"]} =' + " %s WHERE " + conditions
 
     try:
-        cursor.execute(
-            query,
-            [data["Update Value"]] + [list(item.values())[0] for item in lookup_keys],
-        )
+        cursor.execute(query, [data["Update Value"]] + [list(item.values())[0] for item in lookup_keys])
         CNX.commit()
         output["Success"] = True
     except Exception as e:
@@ -199,11 +262,24 @@ def edit_row(table: str, data: dict):
     cursor.close()
     return output
 
-def remove_row(table: str, data: dict):
+def remove_row(table: str, data: dict) -> dict:
+    """Deletes a row to the table.
+
+    Args:
+        table (str): Either Faculty, Committee, or Relation.
+        data (dict): The appropriate data related to the table, including a key containing a list of
+        lookup keys.
+
+    Returns:
+        dict: A dictonary containing the Success and Error keys, wherever applicable, indicating if the
+        operation was successful or not and error associated with it.
+    """
     cursor = CNX.cursor()
     output = {"Success": False}
 
     prefix = ""
+    
+    # Dynamically formats the list of look up keys in AND logic. 
     for key in data.keys():
         prefix += key + " = %s"
         prefix += " AND " if prefix.count("AND") < len(data.keys()) - 1 else ""
@@ -222,20 +298,47 @@ def remove_row(table: str, data: dict):
     return output
 
 @app.route("/add/<table>", methods=["POST"])
-def add(table: str):
+def add(table: str) -> Response:
+    """Route to add row to a particular table.
+    
+    If table is Faculty, the expected keys are the following: FacultyName, FacultyDepartment,
+    FacultyAffiliation, FacultyTitle.
+    
+    If table is Committee, the expected keys are the following: CommitteeDesignation, CommitteeCode,
+    CommitteeName, CommitteeType.
+    
+    If the table is Relation, the expected keys are the following: FacultyName, CommitteeName,
+    ServingPeriod.
+
+    Args:
+        table (str): Either Faculty, Commmittee, or Relation.
+
+    Returns:
+        Response: Return's a 200 JSON response.
+    """
     output = {"Error": "Request was invalid"}
 
     if table in ["Faculty", "Committee", "Relation"] and request.is_json:
-        # Faculty Keys: FacultyName, FacultyDepartment, FacultyAffiliation, FacultyTitle
-        # Committee Keys: CommitteeDesignation, CommitteeCode, CommitteeName, CommitteeType
-        # Relation Keys: FacultyName, CommitteeName, ServingPeriod
         payload = request.json
         output = add_row(table, payload)
 
     return Response(dumps(output), status=200, mimetype="application/json")
 
 @app.route("/edit/<table>", methods=["POST"])
-def edit(table: str):
+def edit(table: str) -> Response:
+    """Route to edit row from a particular table.
+    
+    Regardles of the table, the expected keys are the following: Lookup Keys (list),
+    Update Key (str), Update Value (str).
+    
+    Note: It is expected that the Lookup Keys and the the Update Key are present in the respective table.
+
+    Args:
+        table (str): Either Faculty, Commmittee, or Relation.
+
+    Returns:
+        Response: Return's a 200 JSON response.
+    """
     output = {"Error": "Request was invalid"}
 
     if table in ["Faculty", "Committee", "Relation"] and request.is_json:
@@ -246,7 +349,21 @@ def edit(table: str):
     return Response(dumps(output), status=200, mimetype="application/json")
 
 @app.route("/remove/<table>", methods=["POST"])
-def remove(table: str):
+def remove(table: str) -> Response:
+    """Route to remove row from a particular table.
+    
+    If table is Faculty, the expected keys are the following: FacultyName, FacultyDepartment.
+    
+    If table is Committee, the expected keys are the following: CommitteeName.
+    
+    If the table is Relation, the expected keys are the following: FacultyName, CommitteeCode.
+
+    Args:
+        table (str): Either Faculty, Commmittee, or Relation.
+
+    Returns:
+        Response: Return's a 200 JSON response.
+    """
     output = {"Error": "Request was invalid"}
 
     if table in ["Faculty", "Committee", "Relation"] and request.is_json:
@@ -259,23 +376,26 @@ def remove(table: str):
     return Response(dumps(output), status=200, mimetype="application/json")
 
 @app.route("/get/<table>", methods=["GET"])
-def get(table: str):
+def get(table: str) -> Response:
+    """Route to get all rows from a particular table.
+    
+    Args:
+        table (str): Either Faculty, Commmittee, or Relation.
+
+    Returns:
+        Response: Return's a 200 JSON response.
+    """
     faculty_data = handle_getting("Faculty")
     committee_data = handle_getting("Committee")
 
     table_data = None
 
-    if table == "Faculty":
-        table_data = format_faculty_table()
-    elif table == "Committee":
-        table_data = format_committee_table()
-    elif table == "Relation":
-        table_data = format_relation_table()
+    if table == "Faculty": table_data = get_faculty_table()
+    elif table == "Committee": table_data = get_committee_table()
+    elif table == "Relation": table_data = get_relation_table()
 
     output = {
-        "Success": len(faculty_data) > 0
-        and len(committee_data) > 0
-        and table_data is not None,
+        "Success": len(faculty_data) > 0 and len(committee_data) > 0 and table_data is not None,
         "Faculty": faculty_data,
         "Committee": committee_data,
         "Table": table_data,

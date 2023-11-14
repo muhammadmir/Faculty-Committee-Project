@@ -24,6 +24,8 @@ $(document).ready(function () {
             data: data.Table,
             select: true,
             dom: 'PBfrtip',
+            pageLength: 20,
+            "order": [[4, 'asc']],
             buttons: [
                 {
                     text: "Delete Selected Row",
@@ -49,7 +51,6 @@ $(document).ready(function () {
                     }
                 }
             ],
-            "order": [[4, 'asc']],
             rowGroup: {
                 dataSrc: 'Committee.Name',
                 startRender: function(rows, group) {
