@@ -2,9 +2,9 @@ from flask import Flask, request, Response
 from flask_cors import CORS
 from json import dumps
 from dotenv import load_dotenv
-import os
-import mysql.connector
 from mysql.connector.cursor import MySQLCursor
+from mysql.connector import connect
+from os import getenv
 
 load_dotenv()
 
@@ -12,15 +12,15 @@ app = Flask(__name__)
 CORS(app)
 
 config = {
-    "user": os.getenv("MYSQL_USER"),
-    "password": os.getenv("MYSQL_PASS"),
-    "host": os.getenv("MYSQL_HOST"),
-    "database": os.getenv("MYSQL_DB"),
+    "user": getenv("MYSQL_USER"),
+    "password": getenv("MYSQL_PASS"),
+    "host": getenv("MYSQL_HOST"),
+    "database": getenv("MYSQL_DB"),
     "connection_timeout": 10,
     "raise_on_warnings": True,
 }
 
-CNX = mysql.connector.connect(**config)
+CNX = connect(**config)
 
 def faculty_attribute_lookup(cursor: MySQLCursor, faculty_name: str) -> list[dict]:
     """Looks up all of the ID's, Department's, Affiliation's, and Title's associated with Faculty's Name in
@@ -328,8 +328,8 @@ def add(table: str) -> Response:
 def edit(table: str) -> Response:
     """Route to edit row from a particular table.
     
-    Regardles of the table, the expected keys are the following: Lookup Keys (list),
-    Update Key (str), Update Value (str).
+    Regardles of the table, the expected keys are the following: Lookup Keys (list), Update Key (str),
+    Update Value (str).
     
     Note: It is expected that the Lookup Keys and the the Update Key are present in the respective table.
 
