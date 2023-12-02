@@ -6,8 +6,6 @@ This project was an assignment for CSCI 300 under Professor Rudniy. The applicat
 ## Technology Used
 This backend of the application was built using [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [MySQL Connector for Python](https://dev.mysql.com/doc/connector-python/en/). The frontend was built using [DataTables](https://datatables.net).
 
-A MySQL and low-budget servers are needed to maintain the project.
-
 ## Features
 This project has three main pages:
 1. Faculty Page
@@ -17,8 +15,6 @@ This project has three main pages:
     * Department
     * Affiliation within Department
     * Title within Department
-
-    Note: Faculty members who belong to multiple Departments will show up multiple times.
 
 2. Committee Page
 
@@ -64,5 +60,3 @@ The MySQL DB should have the following Tables with the following headers:
     * Serving Period
 
 ## To-do List
-1. Document Flask code
-2. Make front-end prettier

@@ -8,6 +8,7 @@ $(document).ready(function () {
             select: true,
             dom: 'PBfrtip',
             pageLength: 20,
+            "order": [[0, 'asc']],
             buttons: [
                 {
                     text: "Delete Selected Row",
@@ -33,21 +34,23 @@ $(document).ready(function () {
                     }
                 }
             ],
+            rowGroup: {
+                dataSrc: 'Name',
+                startRender: function(rows, group) {
+                    var style = '"background-color: rgb(209, 209, 209);"';
+                    var td = '<td style=' + style + ' colspan=5>' + group + '</td>';
+                    return $('<tr class="group group-start">' +  td + '</tr>');
+                }
+            },
             searchPanes: {
                 cascadePanes: true,
                 threshold: 1.0,
             },
-            columnDefs: [
-                {
-                    searchPanes: {
-                        show: false
-                    },
-                    target: [0]
-                }
-            ],
             columns: [
                 { // 0
                     data: 'Name',
+                    "orderData": [0],
+                    visible: false,
                 },
                 { // 1
                     data: 'Department',
